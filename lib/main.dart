@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:nsa_app_giuseppe/pages/atleti_page.dart';
-import 'package:nsa_app_giuseppe/pages/home_page.dart';
+import 'package:nsa_app/pages/home_page.dart';
+import 'package:nsa_app/pages/profile_page.dart';
+import 'package:nsa_app/pages/savedlogin_page.dart';
+import 'package:nsa_app/pages/signin_page.dart';
+import 'package:nsa_app/pages/login_page.dart';
 
 void main() {
   runApp(const MainApp());
@@ -14,7 +17,6 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     const Color rosso = Color.fromARGB(255, 192, 65, 53);
     const Color bianco = Color.fromARGB(255, 247, 247, 247);
-
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
@@ -35,10 +37,14 @@ class MainApp extends StatelessWidget {
         ),
       ),
       routes: {
+        "/SavedLoginPage": (context) => const SavedLoginPage(),
+        "/LoginPage": (context) => const LoginPage(),
+        "/SigninPage": (context) => const SigninPage(),
         "/HomePage": (context) => const HomePage(),
-        "/AtletiPage": (context) => const AtletiPage(),
+        "/ProfilePage": (context) => const ProfilePage(),
       },
-      initialRoute: "/HomePage",
+      //initialRoute: "/SigninPage",
+      initialRoute: "/SavedLoginPage",
     );
   }
 }

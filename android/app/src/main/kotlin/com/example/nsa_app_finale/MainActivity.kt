@@ -1,4 +1,4 @@
-package com.example.nsa_app_giuseppe
+package com.example.nsa_app_finale
 
 import io.flutter.embedding.android.FlutterActivity
 

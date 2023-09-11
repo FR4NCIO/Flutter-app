@@ -1,10 +1,10 @@
 # Project-level configuration.
 cmake_minimum_required(VERSION 3.14)
-project(nsa_app_giuseppe LANGUAGES CXX)
+project(nsa_app_finale LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "nsa_app_giuseppe")
+set(BINARY_NAME "nsa_app_finale")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

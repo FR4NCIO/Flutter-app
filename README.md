@@ -1,3 +1,3 @@
-# nsa_app_giuseppe
+# nsa_app_finale
 
 A new Flutter project.

@@ -1,6 +1,6 @@
 {
-    "name": "nsa_app_giuseppe",
-    "short_name": "nsa_app_giuseppe",
+    "name": "nsa_app_finale",
+    "short_name": "nsa_app_finale",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

@@ -1,37 +1,96 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:nsa_app/services/shared_preferences_service.dart';
 
 class APIService {
   static var client = http.Client();
 
-  static Future<List<Map<String, dynamic>>> pullUtenti() async {
-    final url = Uri.https("nsafitness.it", "/applicazione/pull/pullUtenti.php");
-    final response = await client.post(url);
+  static Future<bool> signin(String nome, String cognome, String username,
+      String email, String password) async {
+    final url = Uri.https("nsafitness.it", "/applicazione/signin.php");
 
-    print("Status code pullUtenti ${response.statusCode}");
-    print("resBody pullUtenti ${response.body}");
+    final response = await client.post(url, body: {
+      "nome": nome,
+      "cognome": cognome,
+      "username": username,
+      "email": email,
+      "passw": password,
+    });
+
+    print("Status code signin ${response.statusCode}");
+    print("resBody signin ${response.body}");
 
     if (response.statusCode == 200) {
       var resBody = jsonDecode(response.body);
-      final List<Map<String, dynamic>> utenti = [];
-
-      resBody.forEach((element) {
-        final Map<String, dynamic> utente = {
-          "id": element["id"],
-          "nome": element["nome"],
-          "cognome": element["cognome"],
-          "username": element["username"],
-        };
-        utenti.add(utente);
-      });
-
-      return utenti;
+      if (resBody['Signin']) {
+        print("Registrazione effettuata");
+        return true;
+      } else {
+        print("Registrazione non effettuata");
+        return false;
+      }
     } else {
-      throw Exception('pullUtenti fallito');
+      print("Registrazione non effettuata, cod: ${response.statusCode}");
+      return false;
     }
   }
 
-  //schede
+  static Future<bool> signinC(String nome, String cognome, String username,
+      String email, String password) async {
+    final url = Uri.https("nsafitness.it", "/applicazione/signinC.php");
+
+    final response = await client.post(url, body: {
+      "email": email,
+    });
+
+    print("Status code signinC ${response.statusCode}");
+    print("resBody signinC ${response.body}");
+
+    if (response.statusCode == 200) {
+      var resBody = jsonDecode(response.body);
+      if (resBody['Check']) {
+        print("Email già presente");
+        return true;
+      } else {
+        print("Email non presente");
+        return false;
+      }
+    } else {
+      print("Controllo non effettuato, cod: ${response.statusCode}");
+      return false;
+    }
+  }
+
+  static Future<bool> login(String email, String password) async {
+    final url = Uri.https("nsafitness.it", "/applicazione/login.php");
+    final response = await client.post(url, body: {
+      "email": email,
+      "passw": password,
+    });
+
+    print("Status code ${response.statusCode}");
+    print("resBody ${response.body}");
+
+    if (response.statusCode == 200) {
+      var resBody = jsonDecode(response.body);
+      if (resBody['Login']) {
+        //print("accesso effettuato");
+        SPService.addString("id", resBody['id']);
+        SPService.addString("nome", resBody['nome']);
+        SPService.addString("cognome", resBody['cognome']);
+        SPService.addString("username", resBody['username']);
+        SPService.addString("email", resBody['email']);
+        return true;
+      } else {
+        //print("accesso non effettuato");
+        return false;
+      }
+    } else {
+      //print("accesso non effettuato, cod: ${response.statusCode}");
+      return false;
+    }
+  }
+
   static Future<List<Map<String, dynamic>>> pullSchede(String idUtente) async {
     final url = Uri.https("nsafitness.it", "/applicazione/pull/pullSchede.php");
     final response = await client.post(url, body: {"id": idUtente});
@@ -55,179 +114,6 @@ class APIService {
       return schede;
     } else {
       throw Exception('pullSchede fallito');
-    }
-  }
-
-  static Future<bool> pushScheda(String nome, String idUtente) async {
-    final url = Uri.https("nsafitness.it", "/applicazione/push/pushScheda.php");
-    final response =
-        await client.post(url, body: {"nome": nome, "idUtente": idUtente});
-
-    print("Status code pushScheda ${response.statusCode}");
-    print("resBody pushScheda ${response.body}");
-
-    if (response.statusCode == 200) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  static Future<bool> removeScheda(String id) async {
-    final url =
-        Uri.https("nsafitness.it", "/applicazione/remove/removeScheda.php");
-    final response = await client.post(url, body: {"id": id});
-
-    print("Status code removeScheda ${response.statusCode}");
-    print("resBody removeScheda ${response.body}");
-
-    if (response.statusCode == 200) {
-      var resBody = jsonDecode(response.body);
-      if (resBody['removeScheda']) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  //esercizi
-  static Future<List<Map<String, dynamic>>> pullEsercizi(
-      String idScheda) async {
-    final url =
-        Uri.https("nsafitness.it", "/applicazione/pull/pullEsercizi.php");
-    final response = await client.post(url, body: {"id": idScheda});
-
-    print("Status code pullEsercizi ${response.statusCode}");
-    print("resBody pullEsercizi ${response.body}");
-
-    if (response.statusCode == 200) {
-      var resBody = jsonDecode(response.body);
-      final List<Map<String, dynamic>> esercizi = [];
-
-      resBody.forEach((element) {
-        final Map<String, dynamic> esercizio = {
-          "id": element["id"],
-          "nome": element["nome"],
-          "ripetizioni": element["ripetizioni"],
-          "serie": element["serie"],
-          "pausa": element["pausa"],
-          "carichi": element["carichi"],
-          "appunti": element["appunti"],
-          "pausaPost": element["pausaPost"],
-          "idScheda": element["idScheda"]
-        };
-        esercizi.add(esercizio);
-      });
-
-      return esercizi;
-    } else {
-      throw Exception('pullEsercizi fallito');
-    }
-  }
-
-  static Future<bool> pushEsercizio(
-      String nome,
-      String ripetizioni,
-      String serie,
-      String pausa,
-      String? carichi,
-      String? appunti,
-      String? pausaPost,
-      String idScheda) async {
-    final url =
-        Uri.https("nsafitness.it", "/applicazione/push/pushEsercizio.php");
-    final response = await client.post(url, body: {
-      "nome": nome,
-      "ripetizioni": ripetizioni,
-      "serie": serie,
-      "pausa": pausa,
-      "carichi": carichi,
-      "appunti": appunti,
-      "pausaPost": pausaPost,
-      "idScheda": idScheda
-    });
-
-    print("Status code pushEsercizio ${response.statusCode}");
-    print("resBody pushEsercizio ${response.body}");
-
-    if (response.statusCode == 200) {
-      var resBody = jsonDecode(response.body);
-      if (resBody['pushEsercizio']) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  static Future<bool> removeEsercizio(String id) async {
-    final url =
-        Uri.https("nsafitness.it", "/applicazione/remove/removeEsercizio.php");
-    final response = await client.post(url, body: {"id": id});
-
-    print("Status code removeEsercizio ${response.statusCode}");
-    print("resBody removeEsercizio ${response.body}");
-
-    if (response.statusCode == 200) {
-      var resBody = jsonDecode(response.body);
-      if (resBody['removeEsercizio']) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  //misure
-  static Future<bool> pushMisura(
-      String nome, String data, String valore, String idUtente) async {
-    final url = Uri.https("nsafitness.it", "/applicazione/push/pushMisura.php");
-    final response = await client.post(url, body: {
-      "nome": nome,
-      "data": data,
-      "valore": valore,
-      "idUtente": idUtente
-    });
-
-    print("Status code pushMisura ${response.statusCode}");
-    print("resBody pushMisura ${response.body}");
-
-    if (response.statusCode == 200) {
-      var resBody = jsonDecode(response.body);
-      if (resBody['pushMisura']) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
-    }
-  }
-
-  static Future<bool> removeMisura(String id) async {
-    final url =
-        Uri.https("nsafitness.it", "/applicazione/remove/removeMisura.php");
-    final response = await client.post(url, body: {"id": id});
-
-    print("Status code removeMisura ${response.statusCode}");
-    print("resBody removeMisura ${response.body}");
-
-    if (response.statusCode == 200) {
-      var resBody = jsonDecode(response.body);
-      if (resBody['removeMisura']) {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
-      return false;
     }
   }
 
@@ -288,6 +174,68 @@ class APIService {
       return misure;
     } else {
       throw Exception('pullMisureMuscolo fallito');
+    }
+  }
+
+  static Future<bool> updateEsercizio(
+    String id,
+    String carichi,
+    String appunti,
+  ) async {
+    final url =
+        Uri.https("nsafitness.it", "/applicazione/update/updateEsercizio.php");
+    final response = await client.post(url, body: {
+      "id": id,
+      "carichi": carichi,
+      "appunti": appunti,
+    });
+
+    print("Status code updateEsercizio ${response.statusCode}");
+    print("resBody updateEsercizio ${response.body}");
+
+    if (response.statusCode == 200) {
+      var resBody = jsonDecode(response.body);
+      if (resBody['updateEsercizio']) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  static Future<List<Map<String, dynamic>>> pullEsercizi(
+      String idScheda) async {
+    final url =
+        Uri.https("nsafitness.it", "/applicazione/pull/pullEsercizi.php");
+    final response = await client.post(url, body: {"id": idScheda});
+
+    print("Status code pullEsercizi ${response.statusCode}");
+    print("resBody pullEsercizi ${response.body}");
+
+    if (response.statusCode == 200) {
+      var resBody = jsonDecode(response.body);
+      final List<Map<String, dynamic>> esercizi = [];
+
+      resBody.forEach((element) {
+        final Map<String, dynamic> esercizio = {
+          "id": element["id"],
+          "nome": element["nome"],
+          "ripetizioni": element["ripetizioni"],
+          "serie": element["serie"],
+          "pausa": element["pausa"],
+          "carichi": element["carichi"],
+          "appunti": element["appunti"],
+          "pausaPost": element["pausaPost"],
+          "idScheda": element["idScheda"]
+        };
+        esercizi.add(esercizio);
+      });
+
+      return esercizi;
+    } else {
+      throw Exception('pullEsercizi fallito');
     }
   }
 }

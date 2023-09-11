@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "nsa_app_giuseppe" "\0"
+            VALUE "FileDescription", "nsa_app_finale" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "nsa_app_giuseppe" "\0"
+            VALUE "InternalName", "nsa_app_finale" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "nsa_app_giuseppe.exe" "\0"
-            VALUE "ProductName", "nsa_app_giuseppe" "\0"
+            VALUE "OriginalFilename", "nsa_app_finale.exe" "\0"
+            VALUE "ProductName", "nsa_app_finale" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

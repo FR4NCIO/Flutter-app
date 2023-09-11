@@ -14,15 +14,10 @@ class EserciziPage extends StatefulWidget {
 
 class _EserciziPageState extends State<EserciziPage> {
   bool loading = true;
-  final Color bianco = const Color.fromARGB(255, 247, 247, 247);
-  late List<Map<String, dynamic>> esercizi = [];
-  TextEditingController nomeC = TextEditingController();
-  TextEditingController ripetizioniC = TextEditingController();
-  TextEditingController serieC = TextEditingController();
-  TextEditingController pausaC = TextEditingController();
   TextEditingController carichiC = TextEditingController();
   TextEditingController appuntiC = TextEditingController();
-  TextEditingController pausaPostC = TextEditingController();
+  final Color bianco = const Color.fromARGB(255, 247, 247, 247);
+  late List<Map<String, dynamic>> esercizi = [];
 
   @override
   void initState() {
@@ -82,28 +77,40 @@ class _EserciziPageState extends State<EserciziPage> {
                       startActionPane: ActionPane(
                         motion: const StretchMotion(),
                         children: [
-                          //azione per eliminare l'esercizio
+                          //azione per modificare l'esercizio
                           SlidableAction(
                             onPressed: (_) {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
                                   scrollable: true,
-                                  title: const Text("Eliminazione esercizio"),
-                                  content: const Text(
-                                      "Si desidera davvero eliminare l'esercizio selezionato?"),
-                                  icon: const Icon(Icons.delete),
-                                  iconColor: Colors.red,
+                                  title: const Text("Modifica appunti"),
+                                  content: Column(children: [
+                                    TextFormField(
+                                        controller: carichiC,
+                                        decoration: const InputDecoration(
+                                            hintText: "Carichi")),
+                                    TextFormField(
+                                        controller: appuntiC,
+                                        decoration: const InputDecoration(
+                                            hintText: "Appunti")),
+                                  ]),
+                                  icon: const Icon(Icons.edit),
+                                  iconColor: Colors.grey,
                                   actions: [
                                     ElevatedButton(
                                         onPressed: () {
                                           Navigator.of(context).pop();
+                                          carichiC.clear();
+                                          appuntiC.clear();
                                         },
-                                        child: const Text("No")),
+                                        child: const Text("Annulla")),
                                     ElevatedButton(
                                         onPressed: () {
-                                          APIService.removeEsercizio(
-                                                  esercizi[index]['id'])
+                                          APIService.updateEsercizio(
+                                                  esercizi[index]['id'],
+                                                  carichiC.text,
+                                                  appuntiC.text)
                                               .then((value) {
                                             if (value) {
                                               Navigator.of(context).pop();
@@ -115,7 +122,7 @@ class _EserciziPageState extends State<EserciziPage> {
                                                     seconds: 1,
                                                     milliseconds: 5),
                                                 content: Text(
-                                                  "Esercizio eliminata!",
+                                                  "Esercizio modificato!",
                                                   style:
                                                       TextStyle(color: bianco),
                                                 ),
@@ -133,7 +140,7 @@ class _EserciziPageState extends State<EserciziPage> {
                                                     seconds: 1,
                                                     milliseconds: 5),
                                                 content: Text(
-                                                  "Esercizio non eliminato!",
+                                                  "Esercizio non modificato!",
                                                   style:
                                                       TextStyle(color: bianco),
                                                 ),
@@ -141,15 +148,15 @@ class _EserciziPageState extends State<EserciziPage> {
                                             }
                                           });
                                         },
-                                        child: const Text("Sì")),
+                                        child: const Text("Conferma")),
                                   ],
                                 ),
                               );
                             },
-                            icon: Icons.delete,
-                            foregroundColor: Colors.red,
+                            icon: Icons.edit,
+                            foregroundColor: Colors.grey,
                             backgroundColor: const Color(0xFF202020),
-                            label: "Elimina",
+                            label: "Modifica",
                           ),
                         ],
                       ),
@@ -208,102 +215,6 @@ class _EserciziPageState extends State<EserciziPage> {
             }),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-          backgroundColor: const Color.fromARGB(255, 192, 65, 53),
-          child: const Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    scrollable: true,
-                    title: const Text("Inserimento nuovo esercizio"),
-                    content: Column(children: [
-                      TextFormField(
-                        controller: nomeC,
-                        decoration: const InputDecoration(hintText: "Nome"),
-                      ),
-                      TextFormField(
-                        controller: ripetizioniC,
-                        decoration:
-                            const InputDecoration(hintText: "ripetizioni"),
-                      ),
-                      TextFormField(
-                        controller: serieC,
-                        decoration: const InputDecoration(hintText: "serie"),
-                      ),
-                      TextFormField(
-                        controller: pausaC,
-                        decoration: const InputDecoration(hintText: "pausa"),
-                      ),
-                      TextFormField(
-                        controller: carichiC,
-                        decoration: const InputDecoration(hintText: "carichi"),
-                      ),
-                      TextFormField(
-                        controller: appuntiC,
-                        decoration: const InputDecoration(hintText: "appunti"),
-                      ),
-                      TextFormField(
-                        controller: pausaPostC,
-                        decoration: const InputDecoration(
-                            hintText: "pausa fine esercizio"),
-                      ),
-                    ]),
-                    //pulsanti
-                    actions: [
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            nomeC.clear();
-                            ripetizioniC.clear();
-                            serieC.clear();
-                            pausaC.clear();
-                            carichiC.clear();
-                            appuntiC.clear();
-                            pausaPostC.clear();
-                          },
-                          child: const Text(
-                            "Annulla",
-                          )),
-                      ElevatedButton(
-                          onPressed: () {
-                            APIService.pushEsercizio(
-                                    nomeC.text,
-                                    ripetizioniC.text,
-                                    serieC.text,
-                                    pausaC.text,
-                                    carichiC.text,
-                                    appuntiC.text,
-                                    pausaPostC.text,
-                                    widget.id)
-                                .then((value) {
-                              if (value) {
-                                setState(() {
-                                  loading = true;
-                                  getEsercizi();
-                                });
-                                Navigator.pop(context);
-                                nomeC.clear();
-                                ripetizioniC.clear();
-                                serieC.clear();
-                                pausaC.clear();
-                                carichiC.clear();
-                                appuntiC.clear();
-                                pausaPostC.clear();
-                              }
-                            });
-                          },
-                          child: const Text(
-                            "Aggiungi",
-                          )),
-                    ],
-                  );
-                });
-          }),
     );
   }
 }
